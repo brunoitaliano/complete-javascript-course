@@ -44,6 +44,51 @@ const restaurant = {
     },
 };
 
+// && and ||
+// Use ANY data type, return ANY data type, short-circuiting
+
+console.log('--------- OR ---------');
+
+console.log(3 || 'Jonas'); //se il primo valore é valido viene restituito.
+// Interessante perchè permette si comporta come un ternario.....
+// ricorda che non funziona se il valore é 0 -> Nullish Coalescing Operator ??
+console.log('' || 'Jonas'); // Jonas
+console.log(true || 0); // true
+console.log(undefined || null); // null. Tieni presente che anche null da' false ma nell'or prevale perchè viene dopo
+console.log(undefined || 0 || '' || 'Hello' || 23 || null); // Hello
+
+//ora vediamo come utilizzarlo al posto di un operatore ternario
+
+// numGests é un valore che non é definito
+console.log('numGuests non definito')
+const guests1 = restaurant.numGuests || 10; // non trova il valore e restituisce 10
+console.log(guests1);
+
+console.log('numGuests = 0  || operator')
+restaurant.numGuests = 0;
+const guests2 = restaurant.numGuests || 10; // 0 equivale a false per cui restituisce 10. Errore!!! Perchè 0 é un valore concreto
+console.log(guests2);
+
+console.log('numGuests = 0  ?? operator')
+//Nullish : null and undefined (NOT 0 or '')
+const guests3 = restaurant.numGuests ?? 10; // restituisce 0. Nullish Coalescing Operator ??
+console.log(guests3);
+
+console.log('--------- AND ---------');
+//comportamento opposto rispetto a ||
+//restituisce il primo valore false
+console.log(0 && 'Jonas'); //0
+console.log(7 && 'Jonas'); //'Jonas' perchè va all'ultimo
+console.log('Hello' && 23 && null && 'jonas'); // null
+
+//ottimo al posto degli if
+//se restuarant.orderPizza NON esiste non chiama la funzione!!
+restaurant.orderPizza && restaurant.orderPizza('mushrooms', 'onions');
+
+
+
+
+
 // REST OPERATOR
 // on left side of =
 // opposto a SPREAD, riunisce i valori in un array
@@ -151,8 +196,8 @@ console.log(restaurantName, hours, tags);
 // In questo caso userà il valore di default che glii assegniamo
 
 // Default values
-const {menu = [], starterMenu: starters = []} = restaurant;
-console.log(menu, starters);
+// const {menu = [], starterMenu: starters = []} = restaurant;
+// console.log(menu, starters);
 
 // Mutating variables
 let a = 111;
@@ -166,6 +211,23 @@ const obj = {a: 23, b: 7, c: 14};
 
 const {fri: {open: o, close: c},} = openingHours; // assegnamo anche un nome ai dati ottenuti
 console.log(o, c);
+
+const menu = [...restaurant.starterMenu, ...restaurant.mainMenu];
+//potremmo iterare con un for ma...
+// for of loop - simile al foreach in php
+for (const item of menu) {
+    console.log(item)
+}
+// non restituisce gli indici
+
+// se desidero gli indici
+for (const item of menu.entries()) {
+    console.log(item);
+}
+//entries é un nuovo array che contiene indice e valore. Per cui posso usare destructuring per fare un elenco indicizzato
+for (const [i, e] of menu.entries()) {
+    console.log(`${i+1}: ${e}`);
+}
 
 // // DESTRUCTURING ARRAY
 //
