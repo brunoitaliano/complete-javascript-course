@@ -4,6 +4,23 @@
 const flights =
     '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
+// const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+
+const openingHours = {
+    thu: {
+        open: 12,
+        close: 22,
+    },
+    fri: {
+        open: 11,
+        close: 23,
+    },
+    sat: {
+        open: 0, // Open 24 hours
+        close: 24,
+    },
+};
+
 // Data needed for first part of the section
 const restaurant = {
     name: 'Classico Italiano',
@@ -12,37 +29,63 @@ const restaurant = {
     starterMenu: ['Focaccia', 'Bruschetta', 'Garlic Bread', 'Caprese Salad'],
     mainMenu: ['Pizza', 'Pasta', 'Risotto'],
 
-    openingHours: {
-        thu: {
-            open: 12,
-            close: 22,
-        },
-        fri: {
-            open: 11,
-            close: 23,
-        },
-        sat: {
-            open: 0, // Open 24 hours
-            close: 24,
-        },
-    },
+    // ES6 enhanced object literals
+    openingHours,
 
-    order: function (starterIndex, mainIndex) {
+    order(starterIndex, mainIndex) {
         return [this.starterMenu[starterIndex], this.mainMenu[mainIndex]];
     },
-    orderDelivery: function ({starterIndex = 1, mainIndex = 0, time = '20:00', address}) { // sono importanti i nomi degli argomenti, non l'ordine!!!!
+
+
+    orderDelivery({starterIndex = 1, mainIndex = 0, time = '20:00', address}) { // sono importanti i nomi degli argomenti, non l'ordine!!!!
         console.log(`Order received! ${this.starterMenu
             [starterIndex]} and ${this.mainMenu[mainIndex]} will be delivered to ${address} at ${time}`);
     },
-    orderPasta: function (ing1, ing2, ing3) {
+    orderPasta(ing1, ing2, ing3) {
         console.log(`Here is your delicious pasta with ${ing1}, ${ing2}, ${ing3}`);
     },
 
-    orderPizza: function (mainIngredient, ...otherIngredientes) { // separa il primo ingrediente dagli altri
+    orderPizza(mainIngredient, ...otherIngredientes) { // separa il primo ingrediente dagli altri
         console.log(mainIngredient);
         console.log(otherIngredientes);
     },
 };
+
+// Optional Chaining ?
+
+//supponiamo di estrarre un orario da openingHours per mon (non esiste...)
+//per evitare che restituisca un  errore usiamo un short circuiting &&
+
+if (restaurant.openingHours && restaurant.openingHours.mon) {
+    console.log(restaurant.openingHours.mon.open);
+    console.log(restaurant.openingHours.mon.open);
+}
+
+// Lo stesso con OPTIONAL CHAINING ?
+
+console.log(restaurant.openingHours.mon?.open);
+// anche multiplo
+console.log(restaurant.openingHours?.mon?.open);
+
+//example
+const days = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+for (const day of days) {
+    const open = restaurant.openingHours[day]?.open ?? 'closed';
+    console.log(`On ${day}, we are open at ${open}`);
+}
+
+// Methods
+//test se un metodo esiste
+console.log(restaurant.order?.(0, 1) ?? 'Method does not exists');
+
+// Arrays
+const users = [
+    {
+        name: 'Jonas',
+        email: 'hell@jonas.io',
+    }
+];
+console.log(users[0]?.name ?? 'Users array empty');
 
 // && and ||
 // Use ANY data type, return ANY data type, short-circuiting
@@ -84,9 +127,6 @@ console.log('Hello' && 23 && null && 'jonas'); // null
 //ottimo al posto degli if
 //se restuarant.orderPizza NON esiste non chiama la funzione!!
 restaurant.orderPizza && restaurant.orderPizza('mushrooms', 'onions');
-
-
-
 
 
 // REST OPERATOR
@@ -160,10 +200,11 @@ console.log(weekdays);
 // riceve valori e li colloca in array;
 const add = function (...numbers) {
     let sum = 0;
-    for(let i = 0; i < numbers.length; i++) {
+    for (let i = 0; i < numbers.length; i++) {
         sum += numbers[i];
-    };
-        console.log(sum);
+    }
+    ;
+    console.log(sum);
 }
 add(2, 3);
 add(5, 3, 6, 8, 2);
@@ -183,13 +224,13 @@ restaurant.orderDelivery({
     starterIndex: 2,
 })
 
-const {name, openingHours, categories} = restaurant;
-console.log(name, openingHours, categories);
+// const {name, openingHours, categories} = restaurant;
+// console.log(name, openingHours, categories);
 
 // É identico al precedente ma possiamo dare il nome che desideriamo ai dati estratti
 // Questo é importantissiimo quando elaboriamo delle api
-const {name: restaurantName, openingHours: hours, categories: tags} = restaurant;
-console.log(restaurantName, hours, tags);
+// const {name: restaurantName, openingHours: hours, categories: tags} = restaurant;
+// console.log(restaurantName, hours, tags);
 
 // Lavorando con dati esterni é importante dare dei valori di default agli elementi importati
 // Ad esempio, il valore 'menu' non esiste nell'array restaurante
@@ -226,7 +267,7 @@ for (const item of menu.entries()) {
 }
 //entries é un nuovo array che contiene indice e valore. Per cui posso usare destructuring per fare un elenco indicizzato
 for (const [i, e] of menu.entries()) {
-    console.log(`${i+1}: ${e}`);
+    console.log(`${i + 1}: ${e}`);
 }
 
 // // DESTRUCTURING ARRAY
