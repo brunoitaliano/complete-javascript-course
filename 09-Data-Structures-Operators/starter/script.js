@@ -4,6 +4,16 @@
 const flights =
     '_Delayed_Departure;fao93766109;txl2133758440;11:25+_Arrival;bru0943384722;fao93766109;11:45+_Delayed_Arrival;hel7439299980;fao93766109;12:05+_Departure;fao93766109;lis2323639855;12:30';
 
+// console.log(flights.split('+')); // solo per test
+
+const getCode = str => str.slice(0,3).toUpperCase(); // str é l'argomento passato
+
+for (const flight of flights.split('+')) {
+    const [type, from, to, time] = flight.split(';'); // dectructuring
+    const output = `${type.startsWith('_Delayed') ? '🔴':''}${type.replaceAll('_', ' ')}${' from '}${getCode(from)}${' to '}${getCode(to)} (${time.replace(':', 'h')})`.padStart(30);// padStart sostituisce con ' ' di default!!!
+    console.log(output);
+}
+
 // const weekdays = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
 
 const openingHours = {
@@ -99,6 +109,107 @@ const checkMiddleSeat = function (seat) {
 checkMiddleSeat('11B');
 checkMiddleSeat('23C');
 checkMiddleSeat('3E');
+
+// altre funzioni stringa
+
+console.log(airline.toLowerCase()); // all lower case
+console.log(airline.toUpperCase()); // all upper case
+console.log('bruno'.toUpperCase()); // all upper case, anche su una stringa
+
+console.log('--- ESEMPIO 2: Fix Capitalization ---');
+const passenger = 'bRuNo'; // correct is Bruno
+const passengerLower = passenger.toLowerCase();
+const passengerCorrect = passengerLower[0].toUpperCase() + passengerLower.slice(1);
+console.log(passengerCorrect);
+
+//comparong email
+console.log('--- ESEMPIO 3: Comparing email ---');
+const email = 'hello@jonas.io';
+const loginEmail = ' Hello@Jonas.Io \n';
+// passi separati
+// const emailLower = loginEmail.toLowerCase();
+// const trimmedEmail = emailLower.trim(); // elimina spazi bianchi e altri caratteri speciali
+// uniti
+const normalizedEmail = loginEmail.toLowerCase().trim();
+console.log(normalizedEmail === email || false);
+
+console.log('--- ESEMPIO 4: replacing ---');
+//replacing
+const priceEU = '288,97€';
+const priceUS = priceEU.replace('€', '$').replace(',', '.');
+// const priceUSperiod = priceUS.replace(',', '.');
+console.log(priceUS);
+
+const announcement = 'All passengers come to boardind door 23. Boarding door 231';
+// console.log(announcement.replace('door', 'gate')); // sostituisce solo la prima ricorrenza. Usa regExp
+console.log(announcement.replace(/door/g, 'gate')); // Usa regExp: g sta per global
+
+// Booleans
+
+const planeb = 'Airbus A320neo';
+console.log(planeb.includes('A320')); // true
+console.log(planeb.includes('Boening')); // false
+console.log(planeb.startsWith('Boening')); // false
+
+if(planeb.startsWith('Airbus') && planeb.endsWith('neo')) {
+    console.log('Part of the NEW AIRbus family');
+}
+
+//Split strings
+console.log('--- SPLIT & JOIN STRINGS ---');
+console.log('a+very+nice+string'.split('+'));
+
+const [firstName, lastName] = 'Bruno Italiano'.split(' '); // splitto e assegno a variabile
+
+//Join - inverso di Split
+console.log(['Mr.', firstName, lastName.toUpperCase()].join(' '));
+
+console.log('--- ESEMPIO 5 ---');
+const capitalizeName = function (name) {
+    const names = name.split(' ');
+    const namesUpper = [];
+
+    for (const n of names) {
+        // namesUpper.push(n[0].toUpperCase() + n.slice(1));
+        namesUpper.push(n.replace(n[0], n[0].toUpperCase())); // stesso risultato della precedente
+    }
+    console.log(namesUpper.join(' '));
+}
+
+capitalizeName('jessica ann smith davis');
+capitalizeName('bruno silvia');
+
+// Padding a string - aggiungi caratteri primo e/o dopo la stringa
+// Utilissimo nell'elaborazione sulle pagine web
+
+const message = 'Go to gate 23!';
+console.log(message.padStart(25, '!')); // la lunghezza complessiva é 25
+console.log('Bruno'.padStart(25, '!'));
+console.log('Bruno'.padStart(25, '!').padEnd(35, '!'));
+
+console.log('---ESEMPIO 6: Padding in un esempio reale ---');
+
+const maskCreditCard = function (number) {
+    const str = number + ''; // equivale a Number(number); converte number in stringa
+    const last = str.slice(-4);;
+    return last.padStart(str.length, '*');
+}
+
+console.log(maskCreditCard(3445266378874899));
+console.log(maskCreditCard('77388288277378'));
+// Tieni presente che in Inspector i numeri sono VISIBILI così.....
+
+// Repeat
+console.log('--- REPEAT ---');
+const message2 = 'Bad waether... All Departues Delayed... ';
+console.log(message2.repeat(5));
+
+const planesInLines = function (n) {
+    console.log(`There are ${n} planes in line ${'🛩'.repeat(n)}`);
+}
+planesInLines(5);
+planesInLines(3);
+planesInLines(12);
 
 
 
