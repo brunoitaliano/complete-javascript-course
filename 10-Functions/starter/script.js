@@ -27,32 +27,53 @@
 
 // High order functions e Callback functions
 
-const oneWord = function (str) {
-    return str.replace(/' /g, '').toLowerCase();
-};
+// const oneWord = function (str) {
+//     return str.replace(/' /g, '').toLowerCase();
+// };
+//
+// const upperFirstWord = function (str) {
+//     const [first, ...other] = str.split(' ');
+//     return [first.toUpperCase(), ...other].join(' ');
+// };
+//
+// // High-order function (function in arguments) n- High level of abstraction
+// const transformer = function (str, fn) {
+//     console.log(`Original string ${str}`);
+//     console.log(`Transformed string: ${fn(str)}`);
+//     console.log(`Transformed by: ${fn.name}`);
+// };
+// //callback 1
+// transformer('Javascript is the best!', upperFirstWord);
+// //callback 2
+// transformer('Javascript is the best!', oneWord);
+//
+// // JS uses callback all the time
+// const high5 = function () {
+//     console.log('👋');
+// };
+//
+// document.body.addEventListener('click', high5);
+// ['Jonas', 'Martha', 'Adam'].forEach(high5);
 
-const upperFirstWord = function (str) {
-    const [first, ...other] = str.split(' ');
-    return [first.toUpperCase(), ...other].join(' ');
-};
 
-// High-order function (function in arguments) n- High level of abstraction
-const transformer = function (str, fn) {
-    console.log(`Original string ${str}`);
-    console.log(`Transformed string: ${fn(str)}`);
-    console.log(`Transformed by: ${fn.name}`);
-};
-//callback 1
-transformer('Javascript is the best!', upperFirstWord);
-//callback 2
-transformer('Javascript is the best!', oneWord);
+// primo accenno alla logica delle closures
 
-// JS uses callback all the time
-const high5 = function () {
-    console.log('👋');
-};
+// const greet = function (greeting) {
+//     return function(name){
+//         console.log(`${greeting} ${name}`);
+//     }
+// }
 
-document.body.addEventListener('click', high5);
-['Jonas', 'Martha', 'Adam'].forEach(high5);
+// la stessa con arrow function. Non servono ne' parentesi ne' return
+const greet = greeting => name => console.log(`${greeting} ${name}`);
+
+const greeterHey = greet('Hey');
+greeterHey('Jonas');
+greeterHey('Steven');
+
+//funziona anche così
+greet('Hello')('Jonas');
+
+
 
 
