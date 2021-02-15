@@ -20,7 +20,7 @@ const createBooking = function (
     price,
   };
   console.log(booking);
-  bookings.push(booking);
+  bookings.push(booking); // add a method tyo bookings.
 };
 
 createBooking('LH123');

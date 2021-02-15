@@ -19,7 +19,7 @@
 //         price
 //     }
 //     console.log(booking);
-//     bookings.push(booking);
+//     bookings.push(booking);  // aggiunge metodo a funzione
 // }
 //
 // createBooking('LH123', 2);

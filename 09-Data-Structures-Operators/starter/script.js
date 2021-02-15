@@ -122,7 +122,7 @@ const passengerLower = passenger.toLowerCase();
 const passengerCorrect = passengerLower[0].toUpperCase() + passengerLower.slice(1);
 console.log(passengerCorrect);
 
-//comparong email
+//comparing email
 console.log('--- ESEMPIO 3: Comparing email ---');
 const email = 'hello@jonas.io';
 const loginEmail = ' Hello@Jonas.Io \n';
@@ -518,7 +518,7 @@ planesInLines(12);
 // console.log(name, openingHours, categories);
 
 // É identico al precedente ma possiamo dare il nome che desideriamo ai dati estratti
-// Questo é importantissiimo quando elaboriamo delle api
+// Questo é importantissimo quando elaboriamo delle api
 // const {name: restaurantName, openingHours: hours, categories: tags} = restaurant;
 // console.log(restaurantName, hours, tags);
 
