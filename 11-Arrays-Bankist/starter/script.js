@@ -74,3 +74,55 @@ const currencies = new Map([
 const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /////////////////////////////////////////////////
+
+// metodi in array
+/* ricorda che gli array sono oggetti e che ereditano tutti i metodi degli oggetti prototype */
+
+let arr = ['a', 'b', 'c', 'd', 'e'];
+
+// SLICE
+
+// -> consente di ottenere una parte dell'array a partire da ...
+
+console.log(arr.slice(2));
+
+// slice -> oppure restituisce risultati in un range: L' indice zero-base indica dove finisce l'intervallo da selezionare.
+// slice seleziona gli elementi fino a quell'indice ma non l'elemento all'indice end.
+
+console.log(arr.slice(2, 4)); // 'c', 'd'
+
+//per iniziare lo slice dal termine dell'array
+console.log(arr.slice(-2)); // 'd', 'e'
+
+//l'unione delle due possibilità (non l'elemento dell'indice finale)
+console.log(arr.slice(1, -2)); // 'b', 'c'
+
+console.log(arr.slice()); //tutto l'array
+console.log([...arr]); // tutto l'array (spread operator)
+
+// SPLICE
+// divide letteralmente l'array
+// non é usato molto se non per cancellare, ad esempio, l'ultimo elemento di un array
+
+console.log(arr.splice(2)); //["c", "d", "e"]
+console.log(arr); // ["a", "b"]
+arr.splice(-1); // cancella l'ultimo elemento
+console.log(arr); // 'a'
+
+// REVERSE
+arr = ['a', 'b', 'c', 'd', 'e'];
+const arr2 = ['d', 'e', 'p', 'x', 'q'];
+console.log(arr2.reverse()); // cambia l'array originale
+
+// CONCAT
+
+const letters = arr.concat(arr2);
+console.log(letters);
+//equivalente
+console.log([...arr, ...arr2]);
+
+//JOIN
+//unisce in una singola stringa l'array
+console.log(letters.join(' - '));
+
+
