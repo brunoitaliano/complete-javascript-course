@@ -38,7 +38,7 @@ const accounts = [account1, account2, account3, account4];
 // Elements
 const labelWelcome = document.querySelector('.welcome');
 const labelDate = document.querySelector('.date');
-const labelBalance = document.querySelector('.balance__value');
+const labelBalance = document.querySelector('.balance__value'); // Balance
 const labelSumIn = document.querySelector('.summary__value--in');
 const labelSumOut = document.querySelector('.summary__value--out');
 const labelSumInterest = document.querySelector('.summary__value--interest');
@@ -64,6 +64,30 @@ const inputClosePin = document.querySelector('.form__input--pin');
 
 // sviluppo Bankist
 
+//creo uno username che é l'insieme delle iniziali del nome completo (vedi esempio più sotto)
+const createUsername = function (accs) {
+    accs.forEach(function (acc) {
+        acc.username = acc.owner
+            .toLowerCase()
+            .split(' ')
+            .map(name => name[0]).join(''); // array function
+    });
+};
+createUsername(accounts);
+
+const updateUI = function (acc) {
+    // Display movements
+    displayMovements(acc.movements);
+
+    // Display balance
+    calcDisplayBalance(acc);
+
+    // Display summary
+    calcDisplaySummary(acc);
+}
+
+
+// MOVEMENTS
 
 const displayMovements = function (movements) {
     containerMovements.innerHTML = '';
@@ -72,14 +96,120 @@ const displayMovements = function (movements) {
         const html = `
     <div class="movements__row">
           <div class="movements__type movements__type--${type}">${i + 1} ${type}</div>
-          <div class="movements__value">${mov}</div>
-        </div>
-    `;
+          <div class="movements__value">${mov}€</div>
+        </div>`;
         containerMovements.insertAdjacentHTML('afterbegin', html);
     });
 }
 
-displayMovements(account1.movements);
+// SALDO
+const calcDisplayBalance = function (acc) {
+    acc.balance = acc.movements.reduce((acc, mov) => acc + mov, 0); // zero é il valore inziale di acc
+    labelBalance.textContent = `${acc.balance} EUR`;
+}
+
+// IN - OUT - INTEREST
+
+
+const calcDisplaySummary = function (acc) {
+    const incomes = acc.movements
+        .filter(mov => mov > 0)
+        .reduce((acc, mov) => acc + mov, 0);
+    labelSumIn.textContent = `${incomes}€`;
+
+
+    const out = acc.movements
+        .filter(mov => mov < 0)
+        .reduce((acc, mov) => acc + mov, 0);
+    labelSumOut.textContent = `${Math.abs(out)}€`;
+
+    const interest = acc.movements
+        .filter(mov => mov > 0)
+        .map(deposit => (deposit * acc.interestRate / 100))
+        .filter((int, i, arr) => { // filtra le quote di interesse inferiori a 1 euro
+            return int >= 1;
+        })
+        .reduce((acc, int) => acc + int, 0);
+    labelSumInterest.textContent = `${interest}€`;
+}
+
+// Chaining Methods
+// total deposit in Dollars
+
+const eurToUsd = 1.1;
+//PIPELINE
+/*
+const totalDepositUSD = movements
+    .filter(mov => mov > 0)
+    .map((mov, i, arr) => { // arr é utilizzato per il debug dell'array creato da map
+        //console.log(arr); // debug
+        return mov * eurToUsd;
+    })
+    .reduce((acc, mov) => acc + mov, 0);
+//console.log(totalDepositUSD);
+
+ */
+
+// LOGIN
+let currentAccount; // definito fuori dall'eventListener perché ne avremo bisogno altrove.
+
+btnLogin.addEventListener('click', function (e) { // e server solo per il preventDefault
+    e.preventDefault(); // serve per fermare il default automatico del form
+
+    currentAccount = accounts.find(acc => acc.username === inputLoginUsername.value);
+    console.log(currentAccount);
+
+    if (currentAccount?.pin === Number(inputLoginPin.value)) // ricorda questo modo di verificare se currentAccount exists (optional chaining)
+    {
+        // Display UI and message
+        labelWelcome.textContent = `Welcome back, ${currentAccount.owner.split(' ')[0]}`;
+        containerApp.style.opacity = 100;
+
+        // Clear input fields
+        inputLoginUsername.value = inputLoginPin.value = '';
+        inputLoginPin.blur();
+
+        // Update UI
+        updateUI(currentAccount);
+
+
+    }
+});
+
+btnTransfer.addEventListener('click', function (e){
+    e.preventDefault();
+    const amount = Number(inputTransferAmount.value);
+    const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
+    console.log(amount, receiverAcc);
+
+    inputTransferAmount.value = inputTransferTo.value =  '';
+
+    if(amount > 0 &&
+        receiverAcc &&
+        currentAccount.balance >= amount &&
+        receiverAcc?.username !== currentAccount.username) {
+        console.log('Transfer valid');
+        currentAccount.movements.push(-amount);
+        receiverAcc.movements.push(amount);
+
+        // Update UI
+        updateUI(currentAccount);
+    }
+})
+
+
+/*
+// esempio di come funziona la creazione dello username con le iniziali del nome
+ */
+/*
+const user = 'Steven Thomas Williams';
+const username = user
+    .toLowerCase()
+    .split(' ')
+    .map(nam =>[0]).join('');
+console.log(username);
+*/
+
 
 /////////////////////////////////////////////////
 /////////////////////////////////////////////////
@@ -235,22 +365,24 @@ TEST DATA 1: Julia's data [3, 5, 2, 12, 7], Kate's data
 TEST DATA 2: Julia's data [9, 16, 6, 8, 3], Kate's data [10, 5, 6, 1, 4]
 
 GOOD LUCK 😀
-*/
+
 
 const setJulia1 = [3, 5, 2, 12, 7];
 const setJulia2 = [9, 16, 6, 8, 3];
 const setKate1 = [4, 1, 15, 8, 3];
 const setKate2 = [10, 5, 6, 1, 4];
 
+ */
+/*
 let checkDogs = function (set1, set2) {
     let juliaDogs = set1.slice(1, 5);
     let juliaDogsDef = juliaDogs.slice(0, 2);
     // con splice
-    /*
-    juliaDogs.splice();
-    juliaDogsDef.splice(0,1); // elimina il primo
-    juliaDogsDef.splice(-2); // elimina gli ultimi 2
-    */
+
+    // juliaDogs.splice();
+    // juliaDogsDef.splice(0,1); // elimina il primo
+    // juliaDogsDef.splice(-2); // elimina gli ultimi 2
+
     let dogs = juliaDogsDef.concat(setKate1);
 
 
@@ -265,6 +397,134 @@ let checkDogs = function (set1, set2) {
 }
 
 checkDogs(setJulia2, setKate2);
+*/
+
+// =============================
+//  MAP
+// =============================
+
+/*
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+const eurToUsd = 1.1;
+
+// const movementsUSD = movements.map(function (mov) {
+//     return mov * eurToUsd;
+// })
+
+const movementsUSD = movements.map((mov) => {
+    return mov * eurToUsd;
+})
+
+console.log(movements);
+console.log(movementsUSD);
+
+const movementsDescriptions = movements.map((mov, i) =>
+    `Movement ${i + 1}: You deposited ${mov > 0 ? 'deposited' : 'withdrew'}${Math.abs(mov)}`
+
+);
+
+console.log(movementsDescriptions);
+*/
+
+// Maximum value using reduce
+
+/*
+const max = movements.reduce((acc, mov) => {
+    if (acc > mov)
+        return acc;
+    else
+        return mov;
+}, movements[0]);
+console.log(max);
+*/
+
+///////////////////////////////////////
+// Coding Challenge #2
+
+/*
+Let's go back to Julia and Kate's study about dogs. This time, they want to convert dog ages to human ages and calculate the average age of the dogs in their study.
+
+Create a function 'calcAverageHumanAge', which accepts an arrays of dog's ages ('ages'), and does the following things in order:
+
+1. Calculate the dog age in human years using the following formula: if the dog is <= 2 years old, humanAge = 2 * dogAge. If the dog is > 2 years old, humanAge = 16 + dogAge * 4.
+2. Exclude all dogs that are less than 18 human years old (which is the same as keeping dogs that are at least 18 years old)
+3. Calculate the average human age of all adult dogs (you should already know from other challenges how we calculate averages 😉)
+4. Run the function for both test datasets
+
+TEST DATA 1: [5, 2, 4, 1, 15, 8, 3]
+TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
+
+GOOD LUCK 😀
+*/
+
+//const data1 = [5, 2, 4, 1, 15, 8, 3]
+
+// calcolo le dog age con MAP
+
+// const humanges = data1.map(function (age) {
+//     if (age > 2) {
+//         return (age * 4) + 16 ;
+//     } else {
+//         return (age * 2)
+//     }
+// })
+
+/*
+
+my solution
+
+const calcAverageHumanAge = function (ages) {
+    const humanges = ages.map(age => age > 2 ? ((age * 4) + 16) : age * 2);
+    console.log(humanges);
+    const adultDogs = humanges.filter(age => age > 18);
+    console.log(adultDogs);
+    // return adultDogs.reduce((acc, ages) => acc + ages, 0) / (adultDogs.length);
+    // alternativa per calcolare average
+    return adultDogs.reduce((acc, ages, i, arr) => acc + ages/arr.length, 0); // arr é l'array elaborato da reduce
+
+}
+console.log(calcAverageHumanAge(data1));
+*/
+
+///////////////////////////////////////
+// Coding Challenge #3
+
+/*
+Rewrite the 'calcAverageHumanAge' function from the previous challenge, but this time as an arrow function, and using chaining!
+
+TEST DATA 1: [5, 2, 4, 1, 15, 8, 3]
+TEST DATA 2: [16, 6, 10, 5, 6, 1, 4]
+
+GOOD LUCK 😀
+*/
+
+// const calcDisplayBalance = function (movements) {
+//     const balance = movements.reduce((acc, mov) => acc + mov, 0);
+/*
+const calcAverageHumanAge = ages => ages
+        .map(age => age > 2 ? ((age * 4) + 16) : age * 2)
+        .filter(age => age > 18)
+        .reduce((acc, ages, i, arr) => acc + ages/arr.length, 0);
+
+console.log(calcAverageHumanAge([5, 2, 4, 1, 15, 8, 3]));  // ricorda le quadre
+*/
+
+// FIND
+//restituisce il primo valore che soddisfa la condizione
+/*
+const firstWithdrawal = movements.find( mov => mov < 0);
+console.log(firstWithdrawal);
+
+// esempio che legge in un array
+
+const account = accounts.find(acc => acc.owner === 'Jessica Davis');
+console.log(account);
+
+ */
+
+
+
+
 
 
 
