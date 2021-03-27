@@ -89,9 +89,13 @@ const updateUI = function (acc) {
 
 // MOVEMENTS
 
-const displayMovements = function (movements) {
+const displayMovements = function (movements, sort = false) {
     containerMovements.innerHTML = '';
-    movements.forEach(function (mov, i) {
+
+    // slice crea un nuovo array SENZA MODIIFICARE L'ORIGINALE
+    const movs = sort ? movements.slice().sort((a, b) => a - b) : movements;
+
+    movs.forEach(function (mov, i) {
         const type = mov > 0 ? 'deposit' : 'withdrawal';
         const html = `
     <div class="movements__row">
@@ -150,6 +154,8 @@ const totalDepositUSD = movements
 
  */
 
+// EVENT LISTENER
+
 // LOGIN
 let currentAccount; // definito fuori dall'eventListener perché ne avremo bisogno altrove.
 
@@ -176,15 +182,15 @@ btnLogin.addEventListener('click', function (e) { // e server solo per il preven
     }
 });
 
-btnTransfer.addEventListener('click', function (e){
+btnTransfer.addEventListener('click', function (e) {
     e.preventDefault();
     const amount = Number(inputTransferAmount.value);
     const receiverAcc = accounts.find(acc => acc.username === inputTransferTo.value);
     console.log(amount, receiverAcc);
 
-    inputTransferAmount.value = inputTransferTo.value =  '';
+    inputTransferAmount.value = inputTransferTo.value = '';
 
-    if(amount > 0 &&
+    if (amount > 0 &&
         receiverAcc &&
         currentAccount.balance >= amount &&
         receiverAcc?.username !== currentAccount.username) {
@@ -195,8 +201,51 @@ btnTransfer.addEventListener('click', function (e){
         // Update UI
         updateUI(currentAccount);
     }
+});
+
+btnLoan.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    const amount = Number(inputLoanAmount.value);
+
+    if (amount > 0 && currentAccount.movements.some(mov => mov >= amount * 0.1)) {
+        // add loan as new movement
+        currentAccount.movements.push(amount);
+
+        // Update UI
+        updateUI(currentAccount);
+    }
+    inputLoanAmount.value = '';
 })
 
+btnClose.addEventListener('click', function (e) {
+    e.preventDefault();
+
+    if ((inputCloseUsername.value === currentAccount.username) && (Number(inputClosePin.value) === currentAccount.pin)) {
+        const index = accounts.findIndex(acc => acc.username === currentAccount.username);
+        console.log(index);
+        // Delete account
+        accounts.splice(index, 1);
+
+        //Hide UI
+        containerApp.style.opacity = 0;
+    }
+    inputCloseUsername.value = inputClosePin.value = '';
+});
+
+let sorted = false;
+btnSort.addEventListener('click', function (e) {
+    e.preventDefault();
+    displayMovements(currentAccount.movements, !sorted);
+    sorted = !sorted;
+});
+
+
+/////////////////////////////////////////////////
+/////////////////////////////////////////////////
+// LECTURES
+
+const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
 
 /*
 // esempio di come funziona la creazione dello username con le iniziali del nome
@@ -210,18 +259,13 @@ const username = user
 console.log(username);
 */
 
-
-/////////////////////////////////////////////////
-/////////////////////////////////////////////////
-// LECTURES
-
 // const currencies = new Map([
 //   ['USD', 'United States dollar'],
 //   ['EUR', 'Euro'],
 //   ['GBP', 'Pound sterling'],
 // ]);
 
-// const movements = [200, 450, -400, 3000, -650, -130, 70, 1300];
+
 
 /////////////////////////////////////////////////
 
@@ -522,7 +566,179 @@ console.log(account);
 
  */
 
+// includes
+/*
+test if in array is a value
+ */
 
+// console.log(movements);
+// console.log(movements.includes(-130)); // equality ===
+
+// some
+/*restituisce true se trova risultati che soddisfano una condizione
+ */
+
+// const anyDeposits = movements.some(mov => mov > 0); // condition
+// console.log(anyDeposits);
+
+// every
+/*
+true se tutti gli elementi soddisfano la condizione
+ */
+
+console.log(movements.every(mov => mov > 0)); // true for account4
+
+//separate callback
+//==========================================
+// const deposit = mov => mov > 0;
+// console.log(movements.some(deposit));
+// console.log(movements.every(deposit));
+// console.log(movements.filter(deposit));
+// =========================================
+
+
+// FLAT MAP (non funziona sui browse vecchi
+
+const arr = [[1, 2, 3], [4, 5, 6], 7, 8]; // nested array
+console.log(arr.flat());
+
+const arrDeep = [[[1, 2], 3], [4, [5, 6]], 7, 8];
+console.log(arrDeep.flat()); // unisce solo al primo livello di profondità
+console.log(arrDeep.flat(2)); // unisce anche il secondo livello
+
+/* immaginiamo di voler calcolare la somma di tutti i movimenti di tutti gli accounts
+ */
+
+// const accountMovements = accounts.map(acc => acc.movements); // ottengo una matrice con tutti i movimenti
+// console.log(accountMovements);
+// const allMovements = accountMovements.flat();
+// console.log(allMovements);
+// const overallBalance = allMovements.reduce((acc, mov) => acc + mov,0);
+// console.log(overallBalance);
+
+// lo stesso chained
+
+//flat
+const overallBalance = accounts
+    .map(acc => acc.movements)
+    .flat()
+    .reduce((acc, mov) => acc + mov, 0);
+console.log(overallBalance);
+
+// flatMap - combina flat con map - solo 1 level deep
+const overallBalance2 = accounts
+    .flatMap(acc => acc.movements)
+    .reduce((acc, mov) => acc + mov, 0);
+console.log(overallBalance2);
+
+// sorting arrays
+
+const owners = ['Jonas', 'Zach', 'Adam', 'Martha'];
+console.log(owners);
+console.log(owners.sort()); // ATTENZIONE: CAMBIA L'ORDINE NELL'ARRAY ORIGINALE
+console.log(owners); // ORDINE CAMBIATO
+
+//>>>>>>>>>>>>>>>> sort funziona solo con le stringhe
+
+// Numbers
+console.log(movements);
+
+// return < 0, A, B (keep order)
+// return > 0, B, A (switch order)
+
+//ascending
+// movements.sort((a, b) => {
+//     if (a > b) return 1;
+//     if (b > a) return -1;
+// });
+//equivalente al superiore
+movements.sort((a,b) => a - b ); //restituisce 1 o -1
+console.log(movements);
+//descending
+// movements.sort((a, b) => {
+//     if (a > b) return -1;
+//     if (b > a) return 1;
+// });
+movements.sort((a,b) => b - a ); //restituisce 1 o -1
+console.log(movements);
+
+
+// FILL ARRAY
+
+const x = new Array(7); // crea un array con sette elementi vuoti
+x.fill(1); // riempie tutti gli elementi con 1
+x.fill(1, 3); // riempi con 1 a partire da index 3 (0, 1, 2, 3...)
+x.fill(1, 3, 5); // riempi con 1 a partire da index 3 e fino a index 5 incluso
+
+const arra = [1, 2, 3, 4, 5 ,6 ,7];
+arra.fill(23, 2, 6); //sostituisce con 23 solo tra gli indici
+console.log(arra);
+
+// Array.from
+/*
+Array é una funzione di js, la stessa che si utilizza quando si scrive ->  const z = new Array()
+ */
+
+const y = Array.from({ length: 7}, () => 1); // crea array lungo 7 con valori 1
+console.log(y);
+
+const z = Array.from({length: 7}, (_, i) => i + 1); //lungo 7 e con sequenza. _ é usato come convenzione
+console.log(z);
+
+// creo un nuovo Array con tutti i movimenti (cifre senza segno €)
+labelBalance.addEventListener('click', function (){
+    const movementsUI = Array.from(document.querySelectorAll('.movements__value'),
+        el => Number(el.textContent.replace('€', '')));
+    console.log(movementsUI);
+})
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// Array Methods Practice
+
+// 1. sum of total deposit
+const bankDepositSum = accounts
+    .flatMap(acc => acc.movements)
+    .filter(mov => mov > 0)
+    .reduce((sum, cur) => sum + cur, 0);
+
+console.log(bankDepositSum);
+
+// 2. how many deposits > 1000
+// NOT using reduce
+/*
+const numDeposits1000 = accounts
+    .flatMap(acc => acc.movements)
+    .filter(mov => mov >= 1000).length;
+ */
+// USING reduce (best)
+const numDeposits1000 = accounts
+    .flatMap(acc => acc.movements)
+    .reduce((count, cur) => (cur >= 1000 ? ++count : count), 0); // ++prima di count !!
+console.log(numDeposits1000);
+
+// 3. create an object with reduce
+const {deposits, withdrawals} = accounts
+    .flatMap(acc => acc.movements).reduce((sums, cur) => {
+        //cur > 0 ? sums.deposits += cur : sums.withdrawals += cur;
+        sums[cur > 0 ? 'deposits' : 'withdrawals'] += cur; // same as before but simpler
+        return sums;
+    }, {deposits: 0, withdrawals: 0});
+console.log(deposits, withdrawals);
+
+// 4.  convert string in Title case
+//this is a nice title -> This Is A Nice Title
+
+const convertTitleCase = function (title) {
+
+    const exceptions = ['a', 'an', 'the', 'but', 'or', 'on', 'in', 'with'];
+
+    return title.toLowerCase().split(' ').map(word =>
+        exceptions.includes(word) ? word : word[0].toUpperCase() + word.slice(1));
+};
+
+console.log(convertTitleCase('this is a nice title'));
+console.log(convertTitleCase('this is a LOMG title but not too long'));
+console.log(convertTitleCase('and here is another title with an EXAMPLE'));
 
 
 
