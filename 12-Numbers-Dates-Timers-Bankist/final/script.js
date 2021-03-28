@@ -372,84 +372,87 @@ btnSort.addEventListener('click', function (e) {
 /*
 ///////////////////////////////////////
 // Converting and Checking Numbers
+// Internally all numbers are represented as float e in binary system (64 bits)
 console.log(23 === 23.0);
 
 // Base 10 - 0 to 9. 1/10 = 0.1. 3/10 = 3.3333333
 // Binary base 2 - 0 1
-console.log(0.1 + 0.2);
-console.log(0.1 + 0.2 === 0.3);
+console.log(0.1 + 0.2); -> 0.30000000000000004
+console.log(0.1 + 0.2 === 0.3); -> false
+Questa sembra inevitabile ed é la ragione per la quale per calcoli finanziati complessi JS (ma anche php & ruby) non sono adatti
+Per questo é meglio utilizzare la rappresentazione come interi dei decimali: 25.50 -> 2550
 
 // Conversion
 console.log(Number('23'));
-console.log(+'23');
+console.log(+'23'); automatically conversion
 
 // Parsing
-console.log(Number.parseInt('30px', 10));
-console.log(Number.parseInt('e23', 10));
+console.log(Number.parseInt('30px', 10)); // il secondo argomento é la radice di conversione
+console.log(Number.parseInt('e23', 10)); // NaN perchè inizia con e
 
 console.log(Number.parseInt('  2.5rem  '));
 console.log(Number.parseFloat('  2.5rem  '));
 
-// console.log(parseFloat('  2.5rem  '));
+// console.log(parseFloat('  2.5rem  ')); meno consigliato
 
 // Check if value is NaN
-console.log(Number.isNaN(20));
-console.log(Number.isNaN('20'));
-console.log(Number.isNaN(+'20X'));
-console.log(Number.isNaN(23 / 0));
+console.log(Number.isNaN(20)); false
+console.log(Number.isNaN('20')); false perchè converte in numero
+console.log(Number.isNaN(+'20X')); true
+console.log(Number.isNaN(23 / 0)); false
 
-// Checking if value is number
-console.log(Number.isFinite(20));
-console.log(Number.isFinite('20'));
-console.log(Number.isFinite(+'20X'));
-console.log(Number.isFinite(23 / 0));
+// Checking if value is number (meglio che NaN) BEST!!!!!
+console.log(Number.isFinite(20)); true
+console.log(Number.isFinite('20')); false
+console.log(Number.isFinite(+'20X')); false
+console.log(Number.isFinite(23 / 0)); flse
 
-console.log(Number.isInteger(23));
-console.log(Number.isInteger(23.0));
-console.log(Number.isInteger(23 / 0));
+console.log(Number.isInteger(23)); true
+console.log(Number.isInteger(23.0)); true
+console.log(Number.isInteger(23 / 0)); false
 
 
 ///////////////////////////////////////
 // Math and Rounding
-console.log(Math.sqrt(25));
-console.log(25 ** (1 / 2));
-console.log(8 ** (1 / 3));
+console.log(Math.sqrt(25)); 5
+console.log(25 ** (1 / 2)); 5 exponential ma equivale a radice quadrata
+console.log(8 ** (1 / 3)); 2 exponential ma equivale a radice cubica
 
-console.log(Math.max(5, 18, 23, 11, 2));
-console.log(Math.max(5, 18, '23', 11, 2));
-console.log(Math.max(5, 18, '23px', 11, 2));
+console.log(Math.max(5, 18, 23, 11, 2)); 23
+console.log(Math.max(5, 18, '23', 11, 2)); 23
+console.log(Math.max(5, 18, '23px', 11, 2)); NaN
 
-console.log(Math.min(5, 18, 23, 11, 2));
+console.log(Math.min(5, 18, 23, 11, 2)); 2
 
 console.log(Math.PI * Number.parseFloat('10px') ** 2);
 
-console.log(Math.trunc(Math.random() * 6) + 1);
+console.log(Math.trunc(Math.random() * 6) + 1); between 1 and 6
 
+// const per produrre un numero tra un minimo e un massimo
 const randomInt = (min, max) =>
   Math.floor(Math.random() * (max - min) + 1) + min;
 // 0...1 -> 0...(max - min) -> min...max
 // console.log(randomInt(10, 20));
 
-// Rounding integers
-console.log(Math.round(23.3));
-console.log(Math.round(23.9));
+// Rounding integers (to the nearest
+console.log(Math.round(23.3)); 23
+console.log(Math.round(23.9));24
 
-console.log(Math.ceil(23.3));
-console.log(Math.ceil(23.9));
+console.log(Math.ceil(23.3)); 24
+console.log(Math.ceil(23.9)); 24
 
-console.log(Math.floor(23.3));
-console.log(Math.floor('23.9'));
+console.log(Math.floor(23.3)); 23
+console.log(Math.floor('23.9')); 23
+console.log(Math.trunc(23.3)); 23
 
-console.log(Math.trunc(23.3));
-
-console.log(Math.trunc(-23.3));
-console.log(Math.floor(-23.3));
+console.log(Math.trunc(-23.3)); -23
+console.log(Math.floor(-23.3)); -24
 
 // Rounding decimals
-console.log((2.7).toFixed(0));
-console.log((2.7).toFixed(3));
-console.log((2.345).toFixed(2));
-console.log(+(2.345).toFixed(2));
+console.log((2.7).toFixed(0)); 3 (string)
+console.log((2.7).toFixed(3)); 2.700 (string)
+console.log((2.345).toFixed(2)); 2.35 (string)
+console.log(+(2.345).toFixed(2)); 2.35 (number)
 
 
 ///////////////////////////////////////
@@ -460,12 +463,13 @@ console.log(5 / 2); // 5 = 2 * 2 + 1
 console.log(8 % 3);
 console.log(8 / 3); // 8 = 2 * 3 + 2
 
-console.log(6 % 2);
+console.log(6 % 2); if 0 it's even
 console.log(6 / 2);
 
-console.log(7 % 2);
+console.log(7 % 2); odd
 console.log(7 / 2);
 
+//function to control if even or odd
 const isEven = n => n % 2 === 0;
 console.log(isEven(8));
 console.log(isEven(23));
@@ -483,36 +487,38 @@ labelBalance.addEventListener('click', function () {
 
 ///////////////////////////////////////
 // Working with BigInt
-console.log(2 ** 53 - 1);
-console.log(Number.MAX_SAFE_INTEGER);
-console.log(2 ** 53 + 1);
-console.log(2 ** 53 + 2);
-console.log(2 ** 53 + 3);
-console.log(2 ** 53 + 4);
+console.log(2 ** 53 - 1); biggest number usable
+console.log(Number.MAX_SAFE_INTEGER); display biggest number usable
+console.log(2 ** 53 + 1); no
+console.log(2 ** 53 + 2); no
+console.log(2 ** 53 + 3); no
+console.log(2 ** 53 + 4); no
 
-console.log(4838430248342043823408394839483204n);
+console.log(4838430248342043823408394839483204n); //bigInt
 console.log(BigInt(48384302));
 
 // Operations
 console.log(10000n + 10000n);
 console.log(36286372637263726376237263726372632n * 10000000n);
-// console.log(Math.sqrt(16n));
+// console.log(Math.sqrt(16n)); ERROR!
 
-const huge = 20289830237283728378237n;
-const num = 23;
-console.log(huge * BigInt(num));
+NOT POSSIBLE MIX REGULAR WITH BIGINT !!!!
+
+const huge = 20289830237283728378237n; bigInt
+const num = 23; regular
+console.log(huge * BigInt(num)); how to mix
 
 // Exceptions
-console.log(20n > 15);
-console.log(20n === 20);
-console.log(typeof 20n);
-console.log(20n == '20');
+console.log(20n > 15); true
+console.log(20n === 20); false
+console.log(typeof 20n); bigint
+console.log(20n == '20'); true
 
-console.log(huge + ' is REALLY big!!!');
+console.log(huge + ' is REALLY big!!!'); converted tto a string
 
 // Divisions
-console.log(11n / 3n);
-console.log(10 / 3);
+console.log(11n / 3n); 3n
+console.log(10 / 3); 3.3333333333333335
 
 
 ///////////////////////////////////////
@@ -523,31 +529,32 @@ console.log(10 / 3);
 const now = new Date();
 console.log(now);
 
-console.log(new Date('Aug 02 2020 18:05:41'));
+console.log(new Date('Aug 02 2020 18:05:41')); parse the time i give
 console.log(new Date('December 24, 2015'));
 console.log(new Date(account1.movementsDates[0]));
 
-console.log(new Date(2037, 10, 19, 15, 23, 5));
-console.log(new Date(2037, 10, 31));
+console.log(new Date(2037, 10, 19, 15, 23, 5)); month are 0 based
+console.log(new Date(2037, 10, 31)); correct to decembre 01
 
-console.log(new Date(0));
-console.log(new Date(3 * 24 * 60 * 60 * 1000));
+console.log(new Date(0)); original
+console.log(new Date(3 * 24 * 60 * 60 * 1000)); in milliseconds from original. The result of operation is TIMESTAMP
+
 
 
 // Working with dates
 const future = new Date(2037, 10, 19, 15, 23);
 console.log(future);
 console.log(future.getFullYear());
-console.log(future.getMonth());
+console.log(future.getMonth()); 0 based
 console.log(future.getDate());
-console.log(future.getDay());
+console.log(future.getDay()); week day
 console.log(future.getHours());
 console.log(future.getMinutes());
 console.log(future.getSeconds());
-console.log(future.toISOString());
-console.log(future.getTime());
+console.log(future.toISOString()); ISO standard
+console.log(future.getTime()); past from Original TIMESTAMP
 
-console.log(new Date(2142256980000));
+console.log(new Date(2142256980000)); convert Timestamp
 
 console.log(Date.now());
 
@@ -558,10 +565,10 @@ console.log(future);
 ///////////////////////////////////////
 // Operations With Dates
 const future = new Date(2037, 10, 19, 15, 23);
-console.log(+future);
+console.log(+future); convert in timestamp
 
 const calcDaysPassed = (date1, date2) =>
-  Math.abs(date2 - date1) / (1000 * 60 * 60 * 24);
+  Math.abs(date2 - date1) / (1000 * 60 * 60 * 24); // 10 days
 
 const days1 = calcDaysPassed(new Date(2037, 3, 4), new Date(2037, 3, 14));
 console.log(days1);
