@@ -74,6 +74,7 @@ btnScrollTo.addEventListener('click', function (e) {
 //   el.addEventListener('click', function (e) {
 //     e.preventDefault();
 //     const id = this.getAttribute('href');
+//     const id = this.getAttribute('href');
 //     console.log(id);
 //     document.querySelector(id).scrollIntoView({ behavior: 'smooth' });
 //   });
