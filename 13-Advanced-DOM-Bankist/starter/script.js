@@ -2,19 +2,38 @@
 
 const btnScrollTo = document.querySelector('.btn--scroll-to');
 const section1 = document.querySelector('#section--1');
-
 const tabs = document.querySelectorAll('.operations__tab');
 const tabsContainer = document.querySelector('.operations__tab-container');
 const tabsContent = document.querySelectorAll('.operations__content');
 
 const nav = document.querySelector('.nav');
 
+/////////////////////////////////////////////////
+// Monitoraggio caricamento e Network
+
+document.addEventListener('DOMContentLoaded', function (e){
+    console.log('HTML parsed and DOM tree built!', e); // quando é caricato il DOM
+});
+
+window.addEventListener('load', function (e) {
+    console.log('page fully loaded!', e); // al termine del caricamento
+});
+
+// window.addEventListener('beforeunload', function (e) {
+//     e.preventDefault(); // non appena l'utente vuole lasciare la pagina (ma funziona solo se l'utente a usato anche poco la pagina!!!)
+//     console.log(e);
+//     e.returnValue = ''; // da mettere per ragioni tecniche - non é customizzabile con un messaggio proprio...
+// }); // da utilizzare solo nel caso si tratti di un form, di un checkout o qualcosa nella quale avvisare l'utente é importante.
+
+
+
 ///////////////////////////////////////
-// Modal window
+// Modal window - Open account
 
 const modal = document.querySelector('.modal');
 const overlay = document.querySelector('.overlay');
 const btnCloseModal = document.querySelector('.btn--close-modal');
+// ci sono più pulsanti Modal "Open Account"
 const btnsOpenModal = document.querySelectorAll('.btn--show-modal');
 
 const openModal = function () {
@@ -27,11 +46,12 @@ const closeModal = function () {
     overlay.classList.add('hidden');
 };
 
+// attivo l'eventListener per tutti i pulsanti
 for (let i = 0; i < btnsOpenModal.length; i++)
     btnsOpenModal[i].addEventListener('click', openModal);
 
-btnCloseModal.addEventListener('click', closeModal);
-overlay.addEventListener('click', closeModal);
+btnCloseModal.addEventListener('click', closeModal); // la X per chiudere
+overlay.addEventListener('click', closeModal); // chiude il modal se si clicca fuori
 
 document.addEventListener('keydown', function (e) {
     if (e.key === 'Escape' && !modal.classList.contains('hidden')) {
@@ -40,13 +60,21 @@ document.addEventListener('keydown', function (e) {
 });
 
 
-// button scrolling
+// button scrolling (per esempio la sezione1
 
 btnScrollTo.addEventListener('click', function (e) {
     const s1coords = section1.getBoundingClientRect();
+
+    // OLD SCHOOL !!!!!!!!!!!!!!!
+
     //   console.log(s1coords);
+
     // per capire...
-    //  console.log(e.target.getBoundingClientRect()); // restituisce tutte le coordinate dell'elemento al momento del click
+    //  console.log(e.target.getBoundingClientRect());
+    /*  Element.getBoundingClientRect() restituisce l'oggetto DOMRect che fornisce
+    tutte le informazioni sulle dimensioni di Element e la sua posizione relativa a viewport
+     */
+
     //   console.log('Current scroll (X/Y)', window.pageXOffset, pageYOffset);
     // 0 0 se non c'è scroll. Se e é al Top X é la distanza che ha percorso da 0 0
 
@@ -54,26 +82,31 @@ btnScrollTo.addEventListener('click', function (e) {
     //       document.documentElement.clientHeight,
     //       document.documentElement.clientWidth);
 
-// Scrolling
-//     window.scrollTo(s1coords.left + window.pageXOffset,
-//         s1coords.top + window.pageYOffset);
+    // Scrolling
+    //     window.scrollTo(s1coords.left + window.pageXOffset,
+    //         s1coords.top + window.pageYOffset);
 
 
-    // OLD SCHOOL !!!!!!!!!!!!!!!
     // window.scrollTo({
     //     left: s1coords.left + window.pageXOffset,
     //     top: s1coords.top + window.pageYOffset,
     //     behavior: 'smooth',
     // });
 
-    // MODERN BROWSER
+    // MODERN BROWSER !!!!!!!!!!!!!!!!!!!
     section1.scrollIntoView({behavior: 'smooth'});
+    /*
+    Muove il parent container in modo che Element (section1 qui) é visibile
+    Vedi la definizione perchè ha argomenti importanti
+     */
 });
 
-// Page navigation
+// Page navigation utilizzando scrollIntoView con l'event delegation
 /*
 creo la navigazione smooth dal menu alle sezioni
  */
+
+// Senza Event Delegation
 
 // document.querySelectorAll('.nav__link').forEach(function (el) {
 //     el.addEventListener('click', function (e){
@@ -86,7 +119,7 @@ creo la navigazione smooth dal menu alle sezioni
 //     });
 // });
 
-// Event delegation
+// Event delegation ##################################################
 // 1. add event listener to common element (.nav__links)
 // 2. determine what element originated the event (e.target)
 
@@ -95,7 +128,7 @@ document.querySelector('.nav__links').addEventListener('click', function (e) {
     //Matching strategy, per individuare solo i link nav__link
     if (e.target.classList.contains('nav__link')) {
         e.preventDefault();
-        const id = e.target.getAttribute('href');
+        const id = e.target.getAttribute('href'); // oggetto da vedere
         document.querySelector(id).scrollIntoView({
             behavior: 'smooth'
         });
@@ -126,7 +159,7 @@ tabsContainer.addEventListener('click', function (e) {
     document.querySelector(`.operations__content--${clicked.dataset.tab}`).classList.add('operations__content--active');
 })
 
-// Menu fade animation
+// Menu fade animation - riduce opacità agli elementi siblings
 
 const handleMover = function (e) {
     if (e.target.classList.contains('nav__link')) {
@@ -157,12 +190,14 @@ nav.addEventListener('mouseout', handleMover.bind(1));
 In pratica: bind passa in automatico l'evento e - Aggiungo il valore di opacity che assumerà il nome this nell'handler
  */
 
+
+
 //Sticky navigation
 /*
 scroll event é attaccato a window e non a document
 
 questo funziona ma window.scrollY é poco efficente
-vedi sott l'implementazione con Intersection API
+vedi sotto l'implementazione con Intersection API
  */
 
 // const initialCoords = section1.getBoundingClientRect();
@@ -173,63 +208,55 @@ vedi sott l'implementazione con Intersection API
 //     else nav.classList.remove('sticky');
 // });
 
+//////////////////////////////////////////////////////////////
 //Sticky navigation: Intersection API
 /*
 vedi la descrizione: https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API
  */
 
-const obsCallback = function (entries, observer) {
+//const obsCallback = function (entries, observer) {
     /*
     ogni qualvolta l'oggetto osservato (section1 qui) intercetta il riferimento ( viewport  se root:null)
     come é definito in obsOptions, viene invocata questa funzione!
      */
-    entries.forEach(entry => {
-        //console.log(entry);
-    })
-};
+    // entries.forEach(entry => {
+    //     //console.log(entry);
+    // })
+//};
 // queste sono le opzioni di IntersectionObserver
 // const obsOptions = {
 //     root: null, // null se il riferimento é il Viewport
 //     threshold: [0, 0.1] // 1.0 significa che il 100% del target é visibile in root. In questo caso é il 10%
 // };
-// const observer = new IntersectionObserver(obsCallback, obsOptions); // (callback, options)
-// observer.observe(section1);
-
-document.addEventListener('DOMContentLoaded', function (e){
-    console.log('HTML parsed and DOM tree built!', e); // quando é caricato il DOM
-});
-
-window.addEventListener('load', function (e) {
-    console.log('page fully loaded!', e); // al termine del caricamento
-});
-
-// window.addEventListener('beforeunload', function (e) {
-//     e.preventDefault(); // non appena l'utente vuole lasciare la pagina (ma funziona solo se l'utente a usato anche poco la pagina!!!)
-//     console.log(e);
-//     e.returnValue = ''; // da mettere per ragioni tecniche - non é customizzabile con un messaggio proprio...
-// }); // da utilizzare solo nel caso si tratti di un form, di un checkout o qualcosa nella quale avvisare l'utente é importante.
 
 
 
-const header = document.querySelector('.header');
+const header = document.querySelector('.header'); // la sezione parent di riferimento
 
 const navHeight = nav.getBoundingClientRect().height; // calcola l'altezza del nav superiore
 //console.log(navHeight);
 
 const stickyNav = function (entries) {
-    const [entry] = entries; // desctructuring
-    // console.log(entry);
-    if (!entry.isIntersecting) nav.classList.add('sticky');
-    else nav.classList.remove('sticky');
+    const [entry] = entries; // desctructuring:
+    // estrae in entry il contenuto ricevuto da IntersectionObserver, un array di valori
+    // fra i quali isIntersecting. E' True quando l'elemento parent é visibile (.header)
+    // diventa false quando parente esce. RootMargin anticipa l'evento di uscita
+    console.log(entry);
+    if (!entry.isIntersecting) nav.classList.add('sticky'); // .header é uscito (calcolando rootMargin)
+    else nav.classList.remove('sticky'); // .header é nel viewport
 }
 
 const headerObserver = new IntersectionObserver(stickyNav, {
     root: null,
     threshold: 0, // cioé quando .header esce dal viewport
-    rootMargin: `-${navHeight}px`, // il margine superiore dove viene chiamata callback
+    rootMargin: `-${navHeight}px`, // Indica che stickyNav viene invocato XXpx prima che .header esca
+    // XXpx corrisponde all'altezza di nav
 });
-headerObserver.observe(header);
+headerObserver.observe(header); // osserva il comportamento di .header !!!!
 
+// ---------------------------------------------------------------------------------------
+
+//////////////////////////////////////////////////////////
 //Reveal Sections
 const allSections = document.querySelectorAll('.section');
 
