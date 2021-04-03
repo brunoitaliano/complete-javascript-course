@@ -1,6 +1,6 @@
 'use strict';
 // OOP in JS
-
+/*
 const Person = function (firstName, birthYear) {
     // instance properties
     this.firstName = firstName;
@@ -13,7 +13,7 @@ const Person = function (firstName, birthYear) {
     // }
 };
 
-
+// OLD SCHOOL!!!! vedi più sotto ES6
 
 const jonas = new Person('Jonas', 1991);
 console.log(jonas);
@@ -32,6 +32,14 @@ console.log(matilda, jack);
 // console.log(matilda instanceof Person); // true
 // console.log(bruno instanceof Person); // false
 
+// STATIC METHOD
+// non ereditati dalle istanze. legate alla classe e non alle istanze
+Person.hey = function () {
+    console.log('hey');
+);
+Person.hey(); // print hey
+
+//
 ///////////////////////////////////////////////////
 // Prototypes
 
@@ -79,10 +87,11 @@ console.log(arr.unique()); // funziona!!!!
 // prototype di qualsiasi elemento
 const h1 = document.querySelector('h1');
 console.dir(h1);
-
+*/
 //////////////////////////////////////////////////////////
 // Coding Chanllenge #1
 
+/*
 const Car = function (make, speed ) {
     this.make = make;
     this.speed = speed;
@@ -107,3 +116,142 @@ bmw.accelerate();
 bmw.accelerate();
 bmw.brake();
 mercedes.brake();
+*/
+/////////////////////////////////////////////////////////////
+// ES6
+
+/*
+// class expression
+//const PersonCl = class {};
+
+// class declaration (é l'equivalente di class expression)
+class PersonCl {
+
+    constructor(fullName, birthYear) {
+        this.fullName = fullName;
+        this.birthYear = birthYear;
+    }
+    // il metodo creato qui va nel prototype dell'oggetto!
+    calcAge() {
+        console.log(2037 - this.birthYear);
+    }
+
+    get age() {
+        return 2037 - this.birthYear; // crea automaticamente la proprietà in prototype
+    }
+
+    // questo setter viene invocato automaticamente quando si chiama il contructor per validare il fullname
+    set fullName(name) {
+        if(name.includes(' ')) this._fullName = name; // l'underscore é posto per "convenzione' per evitare il conflitto con il constructor.
+        else alert(`${name} is not a full name!`)
+        // E' stata creata una nuova proprietà _fullName
+        // Per ottenere il fullName si imposta un getter
+    }
+
+    get fullname() {
+        return this._fullName; // necessario per ottenere fullname settato con il set
+    }
+
+    // Static method - PersonCl.hey() - available only for class and NOT for instances
+    static hey() {
+        console.log('hey');
+    }
+}
+const jessica = new PersonCl('Jessica hans', 1996);
+console.log(jessica);
+jessica.calcAge();
+console.log(jessica.age);
+
+// 1. Classes are NOT hoisted
+// 2. Classes are first-class citizes
+// 3. Classes are executed in strict mode
+
+// GETTER - SETTER
+
+const account = {
+    owner: 'Jonas',
+    movements: [200, 300, 500, 350, 250],
+
+    get latest() {
+        return this.movements.slice(-1).pop(); // restituisce il valore estraendolo dall'array [250].pop()  -> 250
+    },
+
+    set latest(mov) {
+        this.movements.push(mov);
+    }
+
+
+
+
+}
+console.log(account.latest); // intercetta automaticamente il setter
+
+account.latest = 50;
+console.log(account.movements);
+console.log(jessica.age);
+*/
+
+///////////////////////////////////////////////////
+//   Object.create
+/*
+const PersonProto = {
+    calcAge() {
+        console.log(2037 - this.birthYear);
+    },
+
+    init(firstName, birthYear) {
+        this.firstName = firstName;
+        this.birthYear = birthYear;
+    },
+};
+
+const sarah = Object.create(PersonProto);
+sarah.init('Sarah', 2001);
+sarah.calcAge();
+ */
+
+////////////////////////////////////////////////////
+// Inheritance Between "Classes": Constructor Functions
+
+
+const Person = function (firstName, birthYear) {
+    this.firstName = firstName;
+    this.birthYear = birthYear;
+
+};
+
+Person.prototype.calcAge = function () {
+    console.log(2037 - this.birthYear);
+};
+
+const Student = function (firstName, birthYear, course) {
+    Person.call(this, firstName, birthYear); // call alla classe parent
+    this.course = course;
+};
+
+// Linking prototypes !!! questa é l'esatta posizione, prima di immettere nuovi elementi in Student.prototype
+Student.prototype = Object.create(Person.prototype);
+
+Student.prototype.introduce = function () {
+    console.log(`My name is ${this.firstName} and I study ${this.course}`);
+}
+
+const mike = new Student('Mike', 2020, 'Computer Science');
+mike.introduce();
+mike.calcAge(); // funziona solo se hai fatto il Linking prototypes!!!
+
+//TESTS
+console.log(mike.__proto__);
+console.log(mike.__proto__.__proto__); // Object Prototype
+
+console.log(mike instanceof Student); // true
+console.log(mike instanceof Person); // true
+console.log(mike instanceof Object); // true
+
+
+Student.prototype.constructor = Student;
+console.log("Dopo la correzione");
+console.log(mike.__proto__);
+console.log(mike.__proto__.__proto__); // Object Prototype
+
+
