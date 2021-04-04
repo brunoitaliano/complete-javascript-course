@@ -213,7 +213,7 @@ sarah.calcAge();
 ////////////////////////////////////////////////////
 // Inheritance Between "Classes": Constructor Functions
 
-
+/*
 const Person = function (firstName, birthYear) {
     this.firstName = firstName;
     this.birthYear = birthYear;
@@ -253,5 +253,164 @@ Student.prototype.constructor = Student;
 console.log("Dopo la correzione");
 console.log(mike.__proto__);
 console.log(mike.__proto__.__proto__); // Object Prototype
+
+ */
+
+////////////////////////////////////////////////////////////
+// Inheritance Between "Classes": ES6 Classes
+/*
+class PersonCl {
+
+    constructor(fullName, birthYear) {
+        this.fullName = fullName;
+        this.birthYear = birthYear;
+    }
+    // il metodo creato qui va nel prototype dell'oggetto!
+    calcAge() {
+        console.log(2037 - this.birthYear);
+    }
+
+    get age() {
+        return 2037 - this.birthYear; // crea automaticamente la proprietà in prototype
+    }
+
+    // questo setter viene invocato automaticamente quando si chiama il contructor per validare il fullname
+    set fullName(name) {
+        if(name.includes(' ')) this._fullName = name; // l'underscore é posto per "convenzione' per evitare il conflitto con il constructor.
+        else alert(`${name} is not a full name!`)
+        // E' stata creata una nuova proprietà _fullName
+        // Per ottenere il fullName si imposta un getter
+    }
+
+    get fullName() {
+        return this._fullName; // necessario per ottenere fullname settato con il set
+    }
+
+    // Static method - PersonCl.hey() - available only for class and NOT for instances
+    static hey() {
+        console.log('hey');
+    }
+}
+
+class StudentCl extends PersonCl{
+    constructor(fullName, birthYear, course) {
+        // Always needs to happen first
+        super(fullName, birthYear);
+        this.course = course;
+    }
+    introduce() {
+        console.log(`My name is ${this.fullName} and I study ${this.course}`);
+    }
+
+// override method
+    calcAge() {
+        console.log(`I'm ${2037 - this.birthYear} years old, but as a student I fell more like ${2037 - this.birthYear + 10}`);
+    }
+
+};
+
+const martha = new StudentCl('Matha Jones', 2012, 'Computer Science');
+martha.introduce();
+martha.calcAge();
+*/
+//////////////////////////////////////////////////////////////////
+
+// Inheritance Betweeen "Classes": Object.create
+// Per alcuni questa é la tecnica migliore perchè non crea "fake classes".
+// Di fatto le ES6 classes sono le pi`¨usate
+/*
+const PersonProto = {
+    calcAge() {
+        console.log(2037 - this.birthYear);
+    },
+
+    init(firstName, birthYear) {
+        this.firstName = firstName;
+        this.birthYear = birthYear;
+    },
+};
+
+const steven = Object.create(PersonProto);
+
+const StudentProto = Object.create(PersonProto);
+StudentProto.init = function (firstName, birthYear, course) {
+    PersonProto.init.call(this, firstName, birthYear);
+    this.course = course;
+};
+
+StudentProto.introduce = function () {
+    console.log(`My name is ${this.firstName} and I study ${this.course}`);
+}
+const jay = Object.create(StudentProto);
+jay.init('Jay', 2010, 'Computer Science');
+jay.introduce();
+jay.calcAge();
+*/
+
+/////////////////////////////////////////////////////
+// PRIVATE CLASS FIELDS
+// 2021 04 - ancora supportato solo da Chrome
+// non completato... vedi nel file final e torna quando sarà utilizzabile
+
+// Public fields
+// Private fields
+// Public methods
+// Private methods
+/*
+class Account {
+    //Public fields (instances)
+    locale = navigator.language;
+
+    // Private fields
+    #movements = [];
+
+
+    constructor(owner, currency, pin) {
+        this.owner = owner;
+        this.currency = currency;
+        // protected property
+        this._pin = pin;
+        // this._movements = []; // non é negli argomenti ma si può creare la proprietà qui
+        // this.local = navigator.language;
+
+        console.log(`Thanks for openin an account, ${owner}`);
+    }
+
+    // Public Interface
+    getMovements() {
+        return this.#movements;
+    }
+
+    deposit(val) {
+        this.#movements.push(val);
+    }
+    withdraw(val) {
+        this.deposit(-val);
+    }
+    _approveLoan(val){
+        return true;
+    }
+
+    requestLoan(val) {
+        if(this._approveLoan(val)) {
+            this.deposit(val);
+            console.log(`Loan approved`);
+        }
+    }
+}
+
+const acc1 = new Account('Jonas', 'EUR', 1111);
+
+acc1.deposit(250);
+acc1.withdraw(140);
+
+acc1.requestLoan(1000);
+acc1._approveLoan(1000); // non ha senso...
+console.log(acc1.getMovements());
+
+console.log(acc1);
+//console.log(acc1.#movements); // Not permitted
+*/
+
 
 
