@@ -129,7 +129,7 @@ const getJSON = function(url, errorMsg = 'Something went wrong') {
 // btn.addEventListener('click', function() {
 //   getCountrydata('portugal')
 // });
-
+/*
 const getCountrydata = function(country) {
   // Country 1
   getJSON(`https://restcountries.eu/rest/v2/name/${country}`, 'Country not found')
@@ -153,6 +153,67 @@ const getCountrydata = function(country) {
 // btn.addEventListener('click', function() {
 //   getCountrydata('portugal');
 // });
+
 getCountrydata('australia');
+
+ */
+///////////////////////////////////////////////////////////////////////////
+// Microtasks priority
+/*
+console.log('Test start'); // ordine di esecusione: 1
+setTimeout(() => console.log('0 sec timer'), 0); // ordine di esecuzione 4
+Promise.resolve('Resolved promise 1').then(res => console.log(res)); // ordine di esecuzione: 3 (perchè in microtasks)
+console.log('Test end'); // ordine di esecuzione: 2
+*/
+
+//la function in Primise é la "execution function" e determina la asicronicità della funzione
+const lotteryPromise = new Promise(function(resolve, reject) {
+
+  console.log('Lottery draw is happening 🔮');
+  setTimeout(function() {
+    if (Math.random() >= 0.5) {
+      resolve('You WIN 💰'); // fulfilled promise cioè risolta. Gli argomenti sono equivalenti al .then -> res
+    } else {
+      reject(new Error('You lost your money 💩')); // err, intercettata da catch
+    }
+  }, 2000);
+});
+
+lotteryPromise.then(res => console.log(res)).catch(err => console.error(err));
+
+// Promisifyng setTimeout
+const wait = function(seconds) {
+  return new Promise(function(resolve) {
+    setTimeout(resolve, seconds * 1000);
+  });
+};
+
+wait(2).then(() => {
+  console.log('I waited 2 seconds'); // esecuzione 1
+  return wait(1);
+}).then(() => console.log('I waited 1 second')); // esecuzione 2
+
+// esecuzione
+wait(2).then(() => {
+  console.log('1 seconds'); // esecuzione 1
+  return wait(1);
+})
+  .then(() => {
+    console.log('2 seconds'); // esecuzione 1
+    return wait(1);
+  })
+.then(() => {
+    console.log('3 seconds'); // esecuzione 1
+    return wait(1);
+  })
+.then(() => {
+    console.log('4 seconds'); // esecuzione 1
+    return wait(1);
+  });
+
+Promise.resolve('abc').then(x => console.log(x));
+Promise.reject(new Error('Problem!')).catch(x => console.error(x));
+
+
 
 
