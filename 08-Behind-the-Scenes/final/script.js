@@ -16,7 +16,7 @@ function calcAge(birthYear) {
       // Creating NEW variable with same name as outer scope's variable
       const firstName = 'Steven';
 
-      // Reasssigning outer scope's variable
+      // Reassigning outer scope's variable
       output = 'NEW OUTPUT!';
 
       const str = `Oh, and you're a millenial, ${firstName}`;

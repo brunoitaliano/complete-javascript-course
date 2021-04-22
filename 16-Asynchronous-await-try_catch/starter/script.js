@@ -315,15 +315,16 @@ btn.addEventListener('click', whereAmI);
 // Lecture 258 - Async
 
 // getPosition é solo per consuming Promise
+/*
 const getPosition = function() {
   return new Promise(function(resolve, reject) {
     navigator.geolocation.getCurrentPosition(resolve, reject);
   });
 };
-
+*/
 
 //it's not blocking the mainthread of the execution!!!
-
+/*
 const whereAmI = async function(country) {
   try {// Geolocation
     const pos = await getPosition();
@@ -354,8 +355,11 @@ console.log('1: Will get location');  //1
 //   .catch(err => console.error(`2: ${err.message} 💥`)) // 3 Promise resolved or rejected se l'ultimo log é fuori da promise
 //   .finally(() => console.log('3: Finished getting location')); //  3 se voglio che venga eseguita dopo Promise
 // console.log('3: Finished getting location'); // 2 se fuori da promise
+*/
+
 
 //equivalente ma con IFEE e async
+/*
 (async function f() {
   try {
     const city = await whereAmI();
@@ -365,3 +369,77 @@ console.log('1: Will get location');  //1
   }
   console.log('3 async: Finished getting location');
 })();
+*/
+
+/*
+const get3Countries = async function (c1, c2, c3) {
+  try {
+    // const [data1] = await getJSON(`https://restcountries.eu/rest/v2/name/${c1}`);
+    // const [data2] = await getJSON(`https://restcountries.eu/rest/v2/name/${c2}`);
+    // const [data3] = await getJSON(`https://restcountries.eu/rest/v2/name/${c3}`);
+
+    /*
+    Nella soluzione sopra e tre await avvengono uno dopo l'altro.
+    Per evitare questo la soluzione sotto é meglio perchè le tre richieste avvengono in PARALLELO
+     */
+
+/*
+    const data = await Promise.all([
+      getJSON(`https://restcountries.eu/rest/v2/name/${c1}`),
+      getJSON(`https://restcountries.eu/rest/v2/name/${c2}`),
+      getJSON(`https://restcountries.eu/rest/v2/name/${c3}`),
+    ]);
+
+    console.log(data.map(d => d[0].capital));
+  }catch (err) {
+    console.error();
+  }
+};
+get3Countries('portugal', 'canada', 'tanzania');
+*/
+
+// Promise.race -
+(async function() {
+  const res = await Promise.race([
+    getJSON(`https://restcountries.eu/rest/v2/name/italy`),
+    getJSON(`https://restcountries.eu/rest/v2/name/egypt`),
+    getJSON(`https://restcountries.eu/rest/v2/name/mexico`)
+  ]);
+  console.log(res[0]); // il primo che risolve
+})();
+
+const timeout = function(sec) {
+  return new Promise(function(_, reject) {
+    setTimeout(function() {
+      reject(new Error('request took too long!'));
+    }, sec * 1000);
+  });
+};
+
+Promise.race([
+  getJSON(`https://restcountries.eu/rest/v2/name/tanzania`),
+  timeout(0.1)
+])
+  .then(res => console.log(res[0]))
+  .catch(err => console.error(err));
+
+//Promise.allSettled
+Promise.allSettled([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another')
+]).then(res => console.log(res)); // restiruisce un array con tutto, anche rejectedPromise.allSettled([
+
+Promise.all([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another')
+]).then(res => console.log(res)); // short circuit al primo rejected
+
+// Promise.any [ES2021] -> funziona 04/2021
+// restituisce il primo success
+Promise.any([
+  Promise.resolve('Success'),
+  Promise.reject('Error'),
+  Promise.resolve('Another')
+]).then(res => console.log(res)); // short circuit al primo rejected
