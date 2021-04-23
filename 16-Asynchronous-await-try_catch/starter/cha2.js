@@ -1,4 +1,4 @@
-'use strict'
+'use strict';
 
 ///////////////////////////////////////
 // Coding Challenge #2
@@ -24,16 +24,16 @@ TEST DATA: Images in the img folder. Test the error handler by passing a wrong i
 
 const wait = function(seconds) {
   return new Promise(function(resolve) {
-    setTimeout(resolve, seconds * 1000)
+    setTimeout(resolve, seconds * 1000);
   });
 };
 
 const imgContainer = document.querySelector('.images');
 
 const createImage = function(imgPath) {
-  return new Promise(function(resolve, reject) {
+  return new Promise(function(resolve, reject) { // return img
     const img = document.createElement('img');
-    img.src = imgPath;
+    img.src = imgPath; // non usa setAttribute
 
     img.addEventListener('load', function() {
       imgContainer.append(img);
@@ -48,25 +48,64 @@ const createImage = function(imgPath) {
 
 let currentImg;
 
-createImage('img/img-1.jpg')
-  .then(img => {
-    currentImg = img;
+// createImage('img/img-1.jpg')
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 1 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//     return createImage('img/img-2.jpg'); // é necessario il return per il .then successivo
+//   })
+//   .then(img => {
+//     currentImg = img;
+//     console.log('Image 2 loaded');
+//     return wait(2);
+//   })
+//   .then(() => {
+//     currentImg.style.display = 'none';
+//   })
+//   .catch(err => console.error(err));
+
+////////////////////////////////////////////
+// CHALLENGE 3 = CHA 2 ma con async
+
+const loadNPause = async (i1, i2) => {
+  try {
+    let img = await createImage(i1);
     console.log('Image 1 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-    return createImage('img/img-2.jpg');
-  })
-  .then(img => {
-    currentImg = img
-    console.log('Image 2 loaded');
-    return wait(2);
-  })
-  .then(() => {
-    currentImg.style.display = 'none';
-  })
-  .catch(err => console.error(err));
+    await wait(2);
+    img.style.display = 'none';
+
+    img = await createImage(i2);
+    console.log('Image 1 loaded');
+    await wait(2);
+    img.style.display = 'none';
+
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+// loadNPause('img/img-1.jpg', 'img/img-2.jpg');
+
+//////////////// PART 2
+//***************** USO DI MAP !!!! *****************************
+
+const loadAll = async function (imgArr) {
+  try {
+    const imgs = imgArr.map(async img => await createImage(img));
+    const imgsEl = await Promise.all(imgs);
+    console.log(imgsEl);
+    imgsEl.forEach(img => img.classList.add('parallel'));
+  } catch (err) {
+    console.error(err);
+  }
+};
+loadAll(['img/img-1.jpg', 'img/img-2.jpg', 'img/img-3.jpg']);
+
+
 
 
 
